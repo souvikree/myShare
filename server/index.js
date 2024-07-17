@@ -18,17 +18,7 @@ const corsOptions ={
 // Connect to MongoDB
 connectDB();
 
-app.use((_req, res, next) => {
-    // Disable caching for all responses by default
-    res.setHeader('Cache-Control', 'no-store');
-  
-    // Set other headers as needed, depending on your application requirements
-    // Example: Allow caching for static assets with a max age of 1 hour
-    // res.setHeader('Cache-Control', 'public, max-age=3600');
-  
-    // Continue to next middleware or route handler
-    next();
-  });
+
   
 
 // Middleware to serve static files

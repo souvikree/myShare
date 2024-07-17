@@ -37,7 +37,7 @@ const FileUpload = () => {
     formData.append('file', file);
 
     try {
-      const response = await axios.post('https://myshare-92im.onrender.com/upload', formData, {
+      const response = await axios.post('http://localhost:8080/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
