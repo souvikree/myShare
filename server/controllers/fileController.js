@@ -41,8 +41,8 @@ const handleFileUpload = async (req, res) => {
     });
 
     const savedFile = await file.save();
-    const protocol = req.secure ? 'https' : 'http';
-    const fileUrl = `${protocol}://${req.get('host')}/files/${savedFile.uuid}`;
+    
+    const fileUrl = `https://${req.get('host')}/files/${savedFile.uuid}`;
     res.json({ fileUrl });
     console.log('File URL:', fileUrl);
   } catch (error) {
