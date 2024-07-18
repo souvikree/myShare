@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCopy, faShareAlt } from '@fortawesome/free-solid-svg-icons';
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [fileUrl, setFileUrl] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadSpeed, setUploadSpeed] = useState(0);
+  const [estimatedTime, setEstimatedTime] = useState(0);
+  const [uploading, setUploading] = useState(false); 
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -37,17 +45,59 @@ const FileUpload = () => {
     formData.append('file', file);
 
     try {
+      setUploading(true); 
+      const startTime = new Date().getTime();
       const response = await axios.post('https://myshare-92im.onrender.com/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        onUploadProgress: (progressEvent) => {
+          const { loaded, total } = progressEvent;
+          const progressPercentage = Math.round((loaded * 100) / total);
+          const elapsedTime = (new Date().getTime() - startTime) / 1000; 
+          const speed = loaded / elapsedTime; 
+          const remainingTime = (total - loaded) / speed; 
+
+          setUploadProgress(progressPercentage);
+          setUploadSpeed((speed / 1024).toFixed(2)); 
+          setEstimatedTime(remainingTime.toFixed(2)); 
+        },
       });
       console.log('Response:', response.data);
       setFileUrl(response.data.fileUrl);
-      alert(`File uploaded successfully!`);
+      showAlertMessage('File uploaded successfully!');
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert('Failed to upload file');
+      showAlertMessage('Failed to upload file');
+    } finally {
+      setUploading(false); 
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(fileUrl);
+    showAlertMessage('Link copied to clipboard!');
+  };
+
+  const showAlertMessage = (message) => {
+    setAlertMessage(message);
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 3000);
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Check out this file!',
+        text: 'I wanted to share this file with you.',
+        url: fileUrl,
+      })
+      .then(() => showAlertMessage('File shared successfully!'))
+      .catch((error) => showAlertMessage('Error sharing file: ' + error));
+    } else {
+      showAlertMessage('Sharing is not supported in this browser.');
     }
   };
 
@@ -100,20 +150,47 @@ const FileUpload = () => {
             <p>Selected file: {file.name}</p>
             <button
               onClick={handleSubmit}
-              className="mt-2 px-4 py-2 bg-blue-500 rounded hover:bg-blue-700"
+              className={`mt-2 px-4 py-2 rounded ${uploading ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'}`}
+              disabled={uploading}
             >
-              Upload
+              {uploading ? 'Uploading...' : 'Upload'}
             </button>
+          </div>
+        )}
+        {uploadProgress > 0 && (
+          <div className="mt-4 text-center">
+            <p>Upload Progress: {uploadProgress}%</p>
+            <p>Upload Speed: {uploadSpeed} KB/s</p>
+            <p>Estimated Time Remaining: {estimatedTime} s</p>
           </div>
         )}
         {fileUrl && (
           <div className="mt-4 text-center">
-            <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-              {fileUrl}
-            </a>
+            <div className="bg-gray-900 bg-opacity-75 p-4 rounded-full inline-flex items-center">
+              <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-white mr-2 no-underline">
+                {fileUrl}
+              </a>
+              <span className="text-white mx-2">|</span>
+              <FontAwesomeIcon
+                icon={faCopy}
+                className="text-white cursor-pointer mx-2"
+                onClick={copyToClipboard}
+              />
+              <span className="text-white mx-2">|</span>
+              <FontAwesomeIcon
+                icon={faShareAlt}
+                className="text-white cursor-pointer mx-2"
+                onClick={handleShare}
+              />
+            </div>
           </div>
         )}
       </div>
+      {showAlert && (
+        <div className="fixed bottom-12 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-25 text-white px-4 py-2 rounded-full shadow-lg">
+          {alertMessage}
+        </div>
+      )}
     </div>
   );
 };
