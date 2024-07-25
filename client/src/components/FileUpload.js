@@ -12,7 +12,7 @@ const FileUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadSpeed, setUploadSpeed] = useState(0);
   const [estimatedTime, setEstimatedTime] = useState(0);
-  const [uploading, setUploading] = useState(false); 
+  const [uploading, setUploading] = useState(false);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -45,7 +45,7 @@ const FileUpload = () => {
     formData.append('file', file);
 
     try {
-      setUploading(true); 
+      setUploading(true);
       const startTime = new Date().getTime();
       const response = await axios.post('https://myshare-92im.onrender.com/upload', formData, {
         headers: {
@@ -54,13 +54,13 @@ const FileUpload = () => {
         onUploadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
           const progressPercentage = Math.round((loaded * 100) / total);
-          const elapsedTime = (new Date().getTime() - startTime) / 1000; 
-          const speed = loaded / elapsedTime; 
-          const remainingTime = (total - loaded) / speed; 
+          const elapsedTime = (new Date().getTime() - startTime) / 1000;
+          const speed = loaded / elapsedTime;
+          const remainingTime = (total - loaded) / speed;
 
           setUploadProgress(progressPercentage);
-          setUploadSpeed((speed / 1024).toFixed(2)); 
-          setEstimatedTime(remainingTime.toFixed(2)); 
+          setUploadSpeed((speed / 1024).toFixed(2));
+          setEstimatedTime(remainingTime.toFixed(2));
         },
       });
       console.log('Response:', response.data);
@@ -70,7 +70,7 @@ const FileUpload = () => {
       console.error('Error uploading file:', error);
       showAlertMessage('Failed to upload file');
     } finally {
-      setUploading(false); 
+      setUploading(false);
     }
   };
 
@@ -102,11 +102,11 @@ const FileUpload = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-900">
-      <div className="bg-gray-800 text-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-2xl mb-4">Drag & Drop. It's online.</h2>
+    <div className="flex justify-center items-center min-h-screen bg-gray-900 px-4">
+      <div className="bg-gray-800 text-white p-6 md:p-8 rounded-lg shadow-lg w-full max-w-md md:max-w-lg lg:max-w-xl">
+        <h2 className="text-2xl md:text-3xl mb-4">Drag & Drop. It's online.</h2>
         <div
-          className={`p-6 border-2 border-dashed rounded-lg cursor-pointer ${dragActive ? 'border-blue-500' : 'border-gray-600'}`}
+          className={`p-4 md:p-6 border-2 border-dashed rounded-lg cursor-pointer ${dragActive ? 'border-blue-500' : 'border-gray-600'}`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
@@ -167,7 +167,7 @@ const FileUpload = () => {
         {fileUrl && (
           <div className="mt-4 text-center">
             <div className="bg-gray-900 bg-opacity-75 p-4 rounded-full inline-flex items-center">
-              <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-white mr-2 no-underline">
+              <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-white mr-2 no-underline break-all">
                 {fileUrl}
               </a>
               <span className="text-white mx-2">|</span>
