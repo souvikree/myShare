@@ -95,7 +95,7 @@ const FileUpload = () => {
         url: fileUrl,
       })
       .then(() => showAlertMessage('File shared successfully!'))
-      .catch((error) => showAlertMessage('Error sharing file: ' + error));
+      .catch((error) => showAlertMessage('Error in sharing file: ' + error));
     } else {
       showAlertMessage('Sharing is not supported in this browser.');
     }
